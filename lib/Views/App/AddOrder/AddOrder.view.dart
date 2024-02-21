@@ -10,11 +10,33 @@ class AddOrderPage extends StatefulWidget {
 }
 
 class _MyScreenState extends State<AddOrderPage> {
+  double _totalModifiedMRP = 0.0;
   List<Map<String, dynamic>> cart = [];
   TextEditingController _customerNameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   TextEditingController _courierChargesController = TextEditingController();
 
+  double calculateTotalModifiedMRP() {
+    double totalModifiedMRP = 0.0;
+    for (var product in cart) {
+      if (product['modifiedMrp'] != null && product['modifiedMrp'].toString() != '') {
+        totalModifiedMRP += double.parse(product['modifiedMrp'].toString());
+      }
+
+    }
+    print("Total Modified MRP: $totalModifiedMRP");
+    return totalModifiedMRP;
+  }
+
+
+// Method to update totalModifiedMRP
+  void updateTotalModifiedMRP() {
+    setState(() {
+      double totalModifiedMRP = calculateTotalModifiedMRP();
+      _totalModifiedMRP = totalModifiedMRP;
+      // print("Updated Total Modified MRP: $_totalModifiedMRP");
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +110,8 @@ class _MyScreenState extends State<AddOrderPage> {
                         children: [
                           Text("Total"),
                           Text(
-                            "3000",
+                            // "0",
+                            "$_totalModifiedMRP",
                             style: TextStyle(
                               fontSize: 25,
                               fontWeight: FontWeight.bold,
@@ -139,16 +162,17 @@ class _MyScreenState extends State<AddOrderPage> {
                               // Add selected product to cart
                               setState(() {
                                 cart.add({
-                                  'productName': result['name'], // Access 'name' property correctly
-                                  'productId': result['id'], // Access 'id' property correctly
+                                  'productName': result['name'],
+                                  'productId': result['id'],
                                   'mrp': result['mrp'],
-                                  'modifiedMrp': '',
+                                  'modifiedMrp': result['mrp'], // Initialize modifiedMrp with the same value as mrp
                                   'quantity': 0,
-                                  'stock':result['stock']
+                                  'stock': result['stock'],
                                 });
-                                print(cart); // Print the cart
+                                updateTotalModifiedMRP();
                               });
                             }
+
                           },
                           child: Text('Add Products'),
                         );
@@ -225,7 +249,6 @@ class _MyScreenState extends State<AddOrderPage> {
                                     Text('mrp: '),
                            Text("${product['mrp']}",style: TextStyle(color: Theme.of(context).primaryColor,fontSize: Spacings.md),)
                                   ],
-
                                 ),
                                 Row(
                                   children: [
@@ -238,6 +261,7 @@ class _MyScreenState extends State<AddOrderPage> {
                                         onChanged: (value) {
                                           setState(() {
                                             product['modifiedMrp'] = value;
+                                            updateTotalModifiedMRP(); // Call updateTotalModifiedMRP here to recalculate the total when a modification occurs
                                           });
                                         },
                                         decoration: InputDecoration(
