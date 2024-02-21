@@ -16,6 +16,52 @@ class _MyScreenState extends State<AddOrderPage> {
   TextEditingController _addressController = TextEditingController();
   TextEditingController _courierChargesController = TextEditingController();
 
+  void _createOrder() {
+    String customerName = _customerNameController.text;
+    String address = _addressController.text;
+    String courierChargesText = _courierChargesController.text;
+
+    // Check if any of the required fields are empty
+    if (customerName.isEmpty || address.isEmpty || courierChargesText.isEmpty) {
+      print('Please fill in all the required fields.');
+      return;
+    }
+
+    // Parse courier charges
+    double courierCharges = double.tryParse(courierChargesText) ?? 0;
+
+    // Calculate the cart value
+    double cartValue = 0;
+    for (var product in cart) {
+      double modifiedMrp = double.tryParse(product['modifiedMrp'].toString()) ?? 0;
+      int stockQuantity = product['stockQuantity'] ?? 0;
+      cartValue += modifiedMrp * stockQuantity;
+    }
+
+    // Calculate the total
+    double total = _totalModifiedMRP + courierCharges;
+
+    // Print order details
+    print('Customer Name: $customerName');
+    print('Address: $address');
+    print('Total: $total');
+    print('Cart Value: $cartValue');
+    print('Courier Value: $courierCharges');
+
+    // Print the cart details
+    print('Cart:');
+    for (var product in cart) {
+      print('Product Name: ${product['productName']}');
+      print('Modified MRP: ${product['modifiedMrp']}');
+      print('Quantity: ${product['stockQuantity']}');
+
+      print('---');
+    }
+  }
+
+
+
+
   double calculateTotalModifiedMRP() {
     double totalModifiedMRP = 0.0;
     for (var product in cart) {
@@ -33,10 +79,20 @@ class _MyScreenState extends State<AddOrderPage> {
   void updateTotalModifiedMRP() {
     setState(() {
       double totalModifiedMRP = calculateTotalModifiedMRP();
-      _totalModifiedMRP = totalModifiedMRP;
-      // print("Updated Total Modified MRP: $_totalModifiedMRP");
+      double courierCharges = double.tryParse(_courierChargesController.text) ?? 0;
+      _totalModifiedMRP = totalModifiedMRP + courierCharges;
     });
   }
+
+
+  void updateTotalModifiedMRPCourier(double courierCharges) {
+    setState(() {
+      double totalModifiedMRP = calculateTotalModifiedMRP() + courierCharges;
+      _totalModifiedMRP = totalModifiedMRP;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,11 +152,18 @@ class _MyScreenState extends State<AddOrderPage> {
                           Text("Courier Charges"),
                           SizedBox(
                             height: 40,
-                            width: 100, // Add a finite width constraint
+                            width: 60, // Add a finite width constraint
                             child: TextField(
                               controller: _courierChargesController,
+                              onChanged: (value) {
+                                double courierCharges = double.tryParse(value) ?? 0;
+                                updateTotalModifiedMRPCourier(courierCharges);
+                              },
+                              keyboardType: TextInputType.number,
                               decoration: InputDecoration(
-                                labelText: 'Courier Charges',
+
+                                contentPadding: EdgeInsets.symmetric(horizontal: 3),
+                                // labelText: 'Courier Charges',
                               ),
                             ),
                           ),
@@ -125,7 +188,7 @@ class _MyScreenState extends State<AddOrderPage> {
                           Text(""),
                           ElevatedButton(
                             onPressed: () {
-                              // Add button functionality
+                              _createOrder();
                             },
                             child: Text('Create'),
                           ),
@@ -213,7 +276,7 @@ class _MyScreenState extends State<AddOrderPage> {
                                 Row(
                                   children: [
                                     Text('Stock: '),
-                                Text('${product['stock']}',style: TextStyle(color: Theme.of(context).primaryColor,fontSize: Spacings.md),),
+                                    Text('${product['stock']}',style: TextStyle(color: Theme.of(context).primaryColor,fontSize: Spacings.md),),
                                   ],
                                 ),
                                 Row(
@@ -225,16 +288,19 @@ class _MyScreenState extends State<AddOrderPage> {
                                         initialValue: "1",
                                         onChanged: (value) {
                                           setState(() {
-                                            product['stockQuantity'] = int.tryParse(value) ?? 0;
+                                            print("Quantity changed: $value");
+                                            // If the value is empty or null, default the quantity to 1
+                                            // Otherwise, parse the value as an integer
+                                            product['stockQuantity'] = value.isEmpty ? 1 : int.tryParse(value) ?? 1;
                                           });
                                         },
                                         keyboardType: TextInputType.numberWithOptions(),
                                         decoration: InputDecoration(
                                           border: OutlineInputBorder(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: 3), // Remove all padding inside the textfield
-
+                                          contentPadding: EdgeInsets.symmetric(horizontal: 3),
                                         ),
                                       ),
+
                                     ),
                                   ],
                                 ),
@@ -282,7 +348,6 @@ class _MyScreenState extends State<AddOrderPage> {
                     },
                   ),
                 ),
-
               ],
             ),
           ),
