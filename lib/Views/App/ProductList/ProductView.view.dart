@@ -1,3 +1,4 @@
+import 'package:VedRich/Theme/Spacing.theme.dart';
 import 'package:flutter/material.dart';
 
 class ProductListScreen extends StatefulWidget {
@@ -7,23 +8,32 @@ class ProductListScreen extends StatefulWidget {
 
 class _ProductListScreenState extends State<ProductListScreen> {
   List<Map<String, dynamic>> products = [
-    {'id': '1', 'name': 'Smartphone', 'price': 500},
-    {'id': '2', 'name': 'Laptop', 'price': 1000},
-    {'id': '3', 'name': 'Headphones', 'price': 50},
+    {'id': '1', 'name': 'Smartphone', 'price': 500, 'stock': 24},
+    {'id': '2', 'name': 'Laptop', 'price': 1000, 'stock': 24},
+    {'id': '3', 'name': 'Headphones', 'price': 50, 'stock': 24},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Products', style: TextStyle(color: Theme.of(context).dividerColor)),
+        title: Text('Products',
+            style: TextStyle(color: Theme.of(context).dividerColor)),
       ),
       body: ListView.builder(
         itemCount: products.length,
         itemBuilder: (context, index) {
           return ListTile(
             title: Text('${products[index]['name']}'),
-            subtitle: Text('Price: \$${products[index]['price']}'),
+            subtitle: Row(
+              children: [
+                Text('Price: \$${products[index]['price']}'),
+                SizedBox(
+                  width: Spacings.sm,
+                ),
+                Text('Stock:${products[index]['stock']}')
+              ],
+            ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -48,10 +58,18 @@ class _ProductListScreenState extends State<ProductListScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white
+            : Colors.orangeAccent.withOpacity(0.7),
+
+        
         onPressed: () {
-          // Add your logic here to handle the tap on the floating button
+          _addNewProduct(context);
         },
-        child: Icon(Icons.add),
+        // onPressed: () {
+        //   _addNewProduct(context);
+        // },
+        child: Icon(Icons.add,size: Spacings.lg,),
       ),
     );
   }
@@ -84,8 +102,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
   }
 
   void _editProduct(BuildContext context, Map<String, dynamic> product) {
-    TextEditingController nameController = TextEditingController(text: product['name']);
-    TextEditingController priceController = TextEditingController(text: product['price'].toString());
+    TextEditingController nameController =
+        TextEditingController(text: product['name']);
+    TextEditingController stockController =
+        TextEditingController(text: product['stock'].toString());
+    TextEditingController priceController =
+        TextEditingController(text: product['price'].toString());
 
     showDialog(
       context: context,
@@ -100,9 +122,19 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 controller: nameController,
                 decoration: InputDecoration(labelText: 'Name'),
               ),
+              SizedBox(
+                height: Spacings.sm,
+              ),
               TextField(
                 controller: priceController,
                 decoration: InputDecoration(labelText: 'Price'),
+              ),
+              SizedBox(
+                height: Spacings.sm,
+              ),
+              TextField(
+                controller: stockController,
+                decoration: InputDecoration(labelText: 'stock'),
               ),
             ],
           ),
@@ -119,6 +151,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 final editedProduct = {
                   'name': nameController.text,
                   'price': double.parse(priceController.text),
+                  'stock': double.parse(stockController.text),
                 };
                 _saveEditedProduct(product, editedProduct);
                 Navigator.of(context).pop();
@@ -131,7 +164,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
     );
   }
 
-  void _saveEditedProduct(Map<String, dynamic> oldProduct, Map<String, dynamic> editedProduct) {
+  void _saveEditedProduct(
+      Map<String, dynamic> oldProduct, Map<String, dynamic> editedProduct) {
     setState(() {
       // Replace the old product with the edited product
       int index = products.indexOf(oldProduct);
@@ -143,6 +177,72 @@ class _ProductListScreenState extends State<ProductListScreen> {
     setState(() {
       // Remove the product at the specified index
       products.removeAt(index);
+    });
+  }
+
+  void _addNewProduct(BuildContext context) {
+    TextEditingController nameController = TextEditingController();
+    TextEditingController priceController = TextEditingController();
+    TextEditingController stockController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Add New Product'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Product Name'),
+              ),
+              SizedBox(
+                height: Spacings.sm,
+              ),
+              TextField(
+                controller: priceController,
+                decoration: InputDecoration(labelText: 'Price'),
+              ),
+              SizedBox(
+                height: Spacings.sm,
+              ),
+              TextField(
+                controller: stockController,
+                decoration: InputDecoration(labelText: 'Stock'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Add new product logic here
+                final newProduct = {
+                  'name': nameController.text,
+                  'price': double.parse(priceController.text),
+                  'stock': double.parse(stockController.text),
+                };
+                _addProduct(newProduct);
+                Navigator.of(context).pop();
+              },
+              child: Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _addProduct(Map<String, dynamic> newProduct) {
+    setState(() {
+      products.add(newProduct);
     });
   }
 }

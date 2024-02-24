@@ -1,5 +1,6 @@
 import 'package:VedRich/Theme/Spacing.theme.dart';
 import 'package:VedRich/Views/App/AddOrder/SearchProduct.view.dart';
+import 'package:VedRich/Widgets/snackBarService.dart';
 import 'package:flutter/material.dart';
 
 // Assuming the SearchProductPage import here
@@ -57,6 +58,8 @@ class _MyScreenState extends State<AddOrderPage> {
 
       print('---');
     }
+    SnackBarService.success(context, "Order Successfully Made");
+    Navigator.pop(context);
   }
 
 

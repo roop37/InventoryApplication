@@ -1,3 +1,4 @@
+import 'package:VedRich/Theme/Spacing.theme.dart';
 import 'package:flutter/material.dart';
 
 class OrderListScreen extends StatefulWidget {
@@ -64,10 +65,13 @@ class _OrderListScreenState extends State<OrderListScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white
+            : Colors.orangeAccent.withOpacity(0.7),
         onPressed: () {
           // Add your logic here to handle the tap on the floating button
         },
-        child: Icon(Icons.add),
+        child: Icon(Icons.add,size: Spacings.lg,),
       ),
     );
   }

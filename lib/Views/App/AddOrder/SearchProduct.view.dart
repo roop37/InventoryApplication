@@ -1,3 +1,4 @@
+import 'package:VedRich/Theme/Spacing.theme.dart';
 import 'package:flutter/material.dart';
 
 class SearchProductPage extends StatefulWidget {
@@ -31,20 +32,22 @@ class _SearchProductPageState extends State<SearchProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Product'),
+        title: Text('Select Product',style: TextStyle(color: Theme.of(context).dividerColor),),
       ),
       body: Column(
         children: [
-          TextField(
-            onChanged: (value) {
-              // Implement search functionality here
-              setState(() {
-                filteredProducts = _filterProducts(value);
-              });
-            },
-            decoration: InputDecoration(
-              labelText: 'Search',
-              prefixIcon: Icon(Icons.search),
+          Padding(
+            padding: const EdgeInsets.all(Spacings.sm),
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  filteredProducts = _filterProducts(value);
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Search',
+                prefixIcon: Icon(Icons.search),
+              ),
             ),
           ),
           Expanded(
