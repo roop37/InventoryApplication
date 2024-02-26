@@ -266,6 +266,7 @@ class _MyScreenState extends State<AddOrderPage> {
                                   onPressed: () {
                                     setState(() {
                                       cart.removeAt(index - 1);
+                                      updateTotalModifiedMRP();
                                     });
                                   },
                                   icon: Icon(Icons.delete,color: Colors.redAccent,),

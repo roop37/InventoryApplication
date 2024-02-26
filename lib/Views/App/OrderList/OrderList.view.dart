@@ -1,5 +1,6 @@
 import 'package:VedRich/Theme/Spacing.theme.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class OrderListScreen extends StatefulWidget {
   @override
@@ -12,25 +13,33 @@ class _OrderListScreenState extends State<OrderListScreen> {
       'orderNumber': '12345',
       'customerName': 'John Doe',
       'address': '123 Main St, City',
-      'product': 'Smartphone',
+      'product': ['Smartphone'],
       'quantity': 2,
       'status': 'Order placed',
+      'date': '2024-02-26',
+      'total': 800
+
     },
     {
       'orderNumber': '54321',
       'customerName': 'Jane Smith',
       'address': '456 Elm St, Town',
-      'product': 'Laptop',
+      'product': ['Smartphone'],
       'quantity': 1,
       'status': 'In transit',
+      'date': '2024-02-26',
+      'total': 800
+
     },
     {
       'orderNumber': '98765',
       'customerName': 'Alice Johnson',
       'address': '789 Oak St, Village',
-      'product': 'Headphones',
+      'product': ['Smartphone'],
       'quantity': 3,
       'status': 'Out for delivery',
+      'date': '2024-02-26',
+      'total': 800
     },
   ];
 
@@ -48,16 +57,11 @@ class _OrderListScreenState extends State<OrderListScreen> {
       body: ListView.builder(
         itemCount: orders.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('${orders[index]['product']}'),
-                Text('Quantity: ${orders[index]['quantity']}'),
-                Text('Customer: ${orders[index]['customerName']}'),
-              ],
-            ),
-            subtitle: Text('Status: ${orders[index]['status']}'),
+
+      return ListTile(
+        subtitle: Text('${orders[index]['customerName']} -  ${DateFormat('MMM dd, yyyy').format(DateTime.parse(orders[index]['date']))}',overflow: TextOverflow.ellipsis,maxLines: 1,),
+            title: Text("#${orders[index]['orderNumber']}   ₹${orders[index]['total']}"),
+            trailing: Text('${orders[index]['status']}'),
             onTap: () {
               _showOrderDetails(orders[index]);
             },
